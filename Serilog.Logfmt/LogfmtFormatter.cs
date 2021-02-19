@@ -42,9 +42,15 @@ namespace Serilog.Logfmt
                 output.Write(" ");
             }
             output.Write("msg=");
-            logEvent.RenderMessage(output);
-            output.Write(" ");
-            output.WriteLine();
+
+            var msg = "";
+            using (var sw = new StringWriter())
+            {
+                logEvent.RenderMessage(sw);
+                msg = sw.ToString();
+            }
+
+            output.WriteLine("{1}{0}{1} ", msg, msg.Contains(" ") ? "\"" :  "");
 
             if (logEvent.Exception != null)
             {
@@ -71,7 +77,7 @@ namespace Serilog.Logfmt
                 }
                 if (dataOptions.HasFlag(LogfmtExceptionDataFormat.Message))
                 {
-                    output.Write("err={0} ", exception.Message);
+                    output.Write("err=\"{0}\" ", exception.Message);
                 }
             }
             switch (_options.ExceptionOptions.StackTraceFormat)
@@ -80,10 +86,11 @@ namespace Serilog.Logfmt
                     output.Write(exception.StackTrace);
                     break;
                 case LogfmtStackTraceFormat.SingleLine:
-                    output.WriteLine(exception.StackTrace.Replace("\n", " "));
+                    output.Write(exception.StackTrace.Replace("\n", "").Replace("\r",""));
                     break;
                 default: break;
             }
+            output.WriteLine();
         }
 
         private string GrafanaLevelValue(LogEventLevel level)
