@@ -1,4 +1,4 @@
-name: cdnuget
+name: cimain
 on:
   push:
     branches: 
