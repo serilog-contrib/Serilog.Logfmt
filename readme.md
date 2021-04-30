@@ -6,6 +6,14 @@ This project contains a simple formatter to format logs in logfmt format using S
 
 Logmft is a compact log format which is is growing in popularity. Using this formatter your programs will generate logs using logfmt allowing easy integrations with products like [Loki](https://grafana.com/oss/loki/) or [hutils](https://github.com/brandur/hutils) among others.
 
+## Adding to your project
+
+Install the nuget package `Serilog.Logfmt`. This package targets `netstandard2.0`:
+
+```
+dotnet add package Serilog.Logfmt
+```
+
 ## How to enable it
 
 Just pass a instance of `LogfmtFormatter` to the Serilog Sink:
