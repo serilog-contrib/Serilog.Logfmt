@@ -25,5 +25,5 @@ jobs:
       with:
         nuget-version: latest
     - name: Publish nuget
-      run: dotnet nuget push ./artifacts/Serilog.Logfmt.nupkg -k ${{secrets.NUGET_API_KEY}} -s https://api.nuget.org/v3/index.json --skip-duplicate 
+      run: dotnet nuget push ./artifacts/Serilog.Logfmt.*.nupkg -k ${{secrets.NUGET_API_KEY}} -s https://api.nuget.org/v3/index.json --skip-duplicate 
 
