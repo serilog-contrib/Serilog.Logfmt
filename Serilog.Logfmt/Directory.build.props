@@ -3,7 +3,7 @@
       <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
       <PackageProjectUrl>https://github.com/eiximenis/Serilog.Logfmt/</PackageProjectUrl>
       <RepositoryUrl>https://github.com/eiximenis/Serilog.Logfmt</RepositoryUrl>
-      <Package>LoCrestia.Serilog.Logfmt</Package>
+      <Package>Serilog.Logfmt</Package>
       <Version>1.0.0$(VersionSuffix)</Version>
       <Authors>Eiximenis</Authors>
       <Company>Lo Crestià</Company>
@@ -14,7 +14,7 @@
     </PropertyGroup>
 
   <!-- Enable deterministic build on GH Actions -->
-  <PropertyGroup Condition="'$(GITHUB_ACTIONS)' == 'false'">
+  <PropertyGroup Condition="'$(GITHUB_ACTIONS)' == 'true'">
       <ContinuousIntegrationBuild>true</ContinuousIntegrationBuild>
   </PropertyGroup>
 </Project>
