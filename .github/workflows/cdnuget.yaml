@@ -1,0 +1,28 @@
+name: cdnuget
+on:
+  release:
+    types:
+    - created
+
+  workflow_dispatch:
+jobs:
+  env:
+    BUILD_CONFIG: Release
+    RELEASE_VERSION: ${{ github.event.release.tag_name }}
+  steps:
+  - uses: actions/checkout@main
+  - uses: actions/setup-dotnet@v1
+    with:
+      dotnet-version: '3.1.x' # SDK Version to use; x will use the latest version of the 3.1 channel
+      - name: dotnet build
+        run: dotnet build Serilog.Logfmt.csproj -c $BUILD_CONFIG
+        working-directory: Serilog.Logfmt
+      - name: dotnet pack
+        run: dotnet pack ./Serilog.Logfmt/Serilog.Logfmt.csproj -c $BUILD_CONFIG --no-build --include-source --include-symbols -o ./artifacts
+      - name: setup nuget
+        uses: NuGet/setup-nuget@v1.0.5
+        with:
+          nuget-version: latest
+      - name: Publish Balea nuget
+        run: dotnet nuget push ./artifacts/Serilog.Logfmt.nupkg -k ${{secrets.NUGET_API_KEY}} -s https://api.nuget.org/v3/index.json --skip-duplicate --version-suffix $VERSION_SUFFIX
+
