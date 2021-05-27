@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel.Design;
 using System.IO;
+using System.Linq.Expressions;
 using System.Text;
 
 namespace Serilog.Logfmt
@@ -31,6 +32,22 @@ namespace Serilog.Logfmt
         {
             var svalue = scalar.Value?.ToString() ?? "";
             var needQuotes = svalue.Contains(" ");
+            if (needQuotes)
+            {
+                switch (_options.DoubleQuotesAction)
+                {
+                    case DoubleQuotesAction.ConvertToSingle:
+                        svalue = svalue.Replace('"', '\'');
+                        break;
+                    case DoubleQuotesAction.Remove:
+                        svalue = svalue.Replace(@"""", "");
+                        break;
+                    case DoubleQuotesAction.Escape:
+                        svalue = svalue.Replace(@"""", @"\""");
+                        break;
+                    default: break;
+                }
+            }
             state.Write("{1}{0}{1}", svalue, needQuotes ? "\"" : "");
             return false;
         }

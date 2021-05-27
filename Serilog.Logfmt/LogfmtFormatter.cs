@@ -3,6 +3,7 @@ using Serilog.Events;
 using Serilog.Formatting;
 using System;
 using System.Collections.Generic;
+using System.Data.SqlTypes;
 using System.IO;
 using System.Linq;
 using System.Linq.Expressions;
@@ -46,8 +47,8 @@ namespace Serilog.Logfmt
             var msg = "";
             using (var sw = new StringWriter())
             {
-                logEvent.RenderMessage(sw);
-                msg = sw.ToString();
+                sw.WriteMessage(logEvent);   // Don't use logEvent.RenderMessage(sw) due to extra quotes added.
+                msg = sw.ToLogfmtQuotedString(_options.DoubleQuotesAction);
             }
 
             output.WriteLine("{1}{0}{1} ", msg, msg.Contains(" ") ? "\"" :  "");

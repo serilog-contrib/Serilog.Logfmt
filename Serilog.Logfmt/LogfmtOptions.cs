@@ -6,13 +6,15 @@ using System.Text;
 
 namespace Serilog.Logfmt
 {
-    public class LogfmtOptions
+    public class LogfmtOptions : IDoubleQuotesOptions
     {
 
         internal bool NormalizeCase { get; private set; }
         internal bool GrafanaLevels { get; private set; }
 
         internal LogExceptionOptions ExceptionOptions {get;}
+
+        internal DoubleQuotesAction DoubleQuotesAction { get; private set; }
 
         internal Func<string, bool> PropertyKeyFilter { get; private set; }
 
@@ -22,11 +24,18 @@ namespace Serilog.Logfmt
             GrafanaLevels = true;
             PropertyKeyFilter = k => false;
             ExceptionOptions = new LogExceptionOptions();
+            DoubleQuotesAction = DoubleQuotesAction.ConvertToSingle;
         }
 
         public LogfmtOptions PreserveCase()
         {
             NormalizeCase = false;
+            return this;
+        }
+
+        public LogfmtOptions OnDoubleQuotes(Action<IDoubleQuotesOptions> optionsAction)
+        {
+            optionsAction?.Invoke(this);
             return this;
         }
 
@@ -46,7 +55,24 @@ namespace Serilog.Logfmt
         {
             optionsAction?.Invoke(ExceptionOptions);
             return this;
-        } 
+        }
 
+        void IDoubleQuotesOptions.Escape()
+        {
+            DoubleQuotesAction = DoubleQuotesAction.Escape;
+        }
+
+        void IDoubleQuotesOptions.ConvertToSingle()
+        {
+            DoubleQuotesAction = DoubleQuotesAction.ConvertToSingle;
+        }
+        void IDoubleQuotesOptions.Preserve()
+        {
+            DoubleQuotesAction = DoubleQuotesAction.None;
+        }
+        void IDoubleQuotesOptions.Remove()
+        {
+            DoubleQuotesAction = DoubleQuotesAction.Remove;
+        }
     }
 }

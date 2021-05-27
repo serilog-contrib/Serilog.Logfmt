@@ -4,6 +4,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Serilog;
 using Serilog.Logfmt;
+using Serilog.Sinks.SystemConsole.Themes;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -25,7 +26,8 @@ namespace Test
                 {
                     config.MinimumLevel.Verbose()
                     .Enrich.FromLogContext()
-                    .WriteTo.Console(new LogfmtFormatter());
+                    // .WriteTo.Console()
+                    .WriteTo.Console(formatter: new LogfmtFormatter());
                 })
                 .ConfigureWebHostDefaults(webBuilder =>
                 {
