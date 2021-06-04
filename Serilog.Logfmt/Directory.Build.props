@@ -4,7 +4,7 @@
       <PackageProjectUrl>https://github.com/eiximenis/Serilog.Logfmt/</PackageProjectUrl>
       <RepositoryUrl>https://github.com/eiximenis/Serilog.Logfmt</RepositoryUrl>
       <Package>Serilog.Logfmt</Package>
-      <Version>1.0.2$(VersionSuffix)</Version>
+      <Version>1.0.3$(VersionSuffix)</Version>
       <Authors>Eiximenis</Authors>
       <Company>Lo Crestià</Company>
       <PublishRepositoryUrl>true</PublishRepositoryUrl>
