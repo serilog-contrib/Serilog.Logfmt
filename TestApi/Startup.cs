@@ -4,9 +4,11 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Serilog.Context;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Cryptography.X509Certificates;
 using System.Threading.Tasks;
 
 namespace Test
@@ -34,7 +36,12 @@ namespace Test
                 endpoints.MapGet("/", async context =>
                 {
                     var logger = lf.CreateLogger("Startup");
-                    logger.LogInformation(@"Message with ""double quotes"" :) ");
+                    LogContext.PushProperty("complex", new { Name = @"Property ""DOUBLE QUOTES"" on it", When = DateTime.UtcNow, Value = 42, Sub = new { Name = "Test", Iv = 32 } }, true);
+                    LogContext.PushProperty("str", "Simple string property");
+                    LogContext.PushProperty("int", 42);
+                    LogContext.PushProperty("test", new[] {10, 100, 1000});
+                    var value = @"This value also have ""double quotes"" on it";
+                    logger.LogInformation(@"Message with ""double quotes"" and a str value: {value} :) ", value);
 
                     await context.Response.WriteAsync("Hello World!");
                 });

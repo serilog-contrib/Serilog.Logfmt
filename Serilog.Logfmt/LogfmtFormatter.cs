@@ -15,7 +15,6 @@ namespace Serilog.Logfmt
 {
     public class LogfmtFormatter : ITextFormatter
     {
-        private readonly LogfmtValueFormatter _formatter;
         private readonly LogfmtOptions _options;
         private Func<string, bool> _propertyKeyFilter;
 
@@ -23,7 +22,6 @@ namespace Serilog.Logfmt
         {
             _options = new LogfmtOptions();
             configOptions?.Invoke(_options);
-            _formatter = new LogfmtValueFormatter(_options);
             _propertyKeyFilter = _options.PropertyKeyFilter;
         }
 
@@ -32,18 +30,19 @@ namespace Serilog.Logfmt
             if (logEvent == null) throw new ArgumentNullException(nameof(logEvent));
             if (output == null) throw new ArgumentNullException(nameof(output));
             output.Write("ts={0} ", logEvent.Timestamp.UtcDateTime.ToString("o"));
-
-
-            output.Write("level={0} ", _options.GrafanaLevels ?  GrafanaLevelValue(logEvent.Level) : logEvent.Level.ToString());
-            foreach (var property in logEvent.Properties.Where(p => _propertyKeyFilter(p.Key)))
+            output.Write("level={0} ", _options.GrafanaLevels ? GrafanaLevelValue(logEvent.Level) : logEvent.Level.ToString());
+            var properties = logEvent.Properties.Where(p => _propertyKeyFilter(p.Key));
+            if (properties.Any())
             {
-                var key = _options.NormalizeCase ? GetNormalizedKeyCase(property.Key) : property.Key;
-                output.Write("{0}=", key);
-                _formatter.Format(property.Value, output);
-                output.Write(" ");
+                var propFormatter = new LogfmtValueFormatter(_options);
+                foreach (var property in properties)
+                {
+                    var key = _options.NormalizeCase ? GetNormalizedKeyCase(property.Key) : property.Key;
+                    propFormatter.Format(key, property.Value, output);
+                }
             }
-            output.Write("msg=");
 
+            output.Write("msg=");
             var msg = "";
             using (var sw = new StringWriter())
             {
@@ -51,8 +50,15 @@ namespace Serilog.Logfmt
                 msg = sw.ToLogfmtQuotedString(_options.DoubleQuotesAction);
             }
 
-            output.WriteLine("{1}{0}{1} ", msg, msg.Contains(" ") ? "\"" :  "");
-
+            if (msg.Contains(" "))
+            {
+                output.WriteLine($@"""{msg}""");
+            }
+            else
+            {
+                output.WriteLine(msg);
+            }
+            
             if (logEvent.Exception != null)
             {
                 LogException(logEvent, output);

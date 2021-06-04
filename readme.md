@@ -31,14 +31,95 @@ Just pass a instance of `LogfmtFormatter` to the Serilog Sink:
 
 Formatter allows for several options to customize the output.
 
+### Double quotes
+
+If the logged property contains an space, it is surrounded between double quotes. To avoid invalid log messages if the property itself contains double quotes, by default the formatter converts the double quotes property to single quotes. However this is configurable using the `OnDoubleQuotes` configuration method:
+
+```csharp
+.UseSerilog((hostBuilderContext, config) =>
+{
+   .WriteTo.Console(formatter: new LogfmtFormatter(opt => opt.OnDoubleQuotes(q => q.ConvertToSingle())));
+})
+```
+
+Following options are available:
+
+* Convert double quotes to single (`q.ConvertToSingle()`). This is the default.
+* Remove the double quotes of the property (`q.Remove()`).
+* Escape the double quotes of the property using `\"` sequence (`q.Escape()`).
+* Do nothing (this can lead to invalid log messages) (`q.Preserve()`).
+
+For example, using `q.ConvertToSingle()` and logging the following:
+
+```csharp
+var value = @"This value also have ""double quotes"" on it";
+logger.LogInformation(@"Message with ""double quotes"" and a str value: {value} :) ", value);
+```
+
+Will generate following message:
+
+```
+ts=2021-06-04T07:48:03.8528712Z level=info msg="Message with 'double quotes' and a str value: This value also have 'double quotes' on it :) "
+```  
+
 ### Including all LogEvent properties
 
-By default, the formatter only serializes the timestamp, level and message properties of the `LogEvent` object. However you can choose to serialize all scalar properties.
-
-> Currently only scalar properties are serialized. Complex (structure, dictionary or array) properties are not serialized.
+By default, the formatter only serializes the timestamp, level and message properties of the `LogEvent` object. However you can choose to serialize all LogEvent properties
 
 ```csharp
 new LogfmtFormatter(opt.IncludeAllProperties())
+```
+
+Using `opt.IncludeAllProperties()` and following code:
+
+```csharp
+LogContext.PushProperty("complex", new { Name = @"Property ""DOUBLE QUOTES"" on it", When = DateTime.UtcNow, Value = 42, Sub = new { Name = "Test", Iv = 32 } }, true);
+LogContext.PushProperty("str", "Simple string property");
+LogContext.PushProperty("int", 42);
+var value = @"This value also have ""double quotes"" on it";
+logger.LogInformation(@"Message with ""double quotes"" and a str value: {value} :) ", value);
+```
+
+Generates the following log message:
+
+```
+ts=2021-06-04T11:24:59.9399900Z level=info value="This value also have 'double quotes' on it" int=42 str="Simple string property" complex.name="Property 'DOUBLE QUOTES' on it" complex.when="6/4/2021 11:24:59 AM" complex.value=42 complex.sub.name=Test complex.sub.iv=32   msg="Message with 'double quotes' and a str value: This value also have 'double quotes' on it :) "
+```
+
+If serializing a complex property, each field name is concatenated to the property name. A complex property like:
+
+```csharp
+LogContext.PushProperty("complex", new { Name = @"Property ""DOUBLE QUOTES"" on it", When = DateTime.UtcNow, Value = 42, Sub = new { Name = "Test", Iv = 32 } }, true);
+```
+
+Generates following entries in the log line:
+
+```
+complex.name="Property 'DOUBLE QUOTES' on it" complex.when="6/4/2021 11:24:59 AM" complex.value=42 complex.sub.name=Test complex.sub.iv=32
+```
+
+By default a dot (`.`) is used a separator but you can use the `UseComplexPropertySeparator` with the separator you want to use:
+
+```csharp
+WriteTo.Console(formatter: new LogfmtFormatter(opt => opt.IncludeAllProperties().UseComplexPropertySeparator("->")));
+``` 
+
+Following entries are generated in the log line:
+
+```
+complex->name="Property 'DOUBLE QUOTES' on it" complex->when="6/4/2021 2:38:59 PM" complex->value=42 complex->sub->name=Test complex->sub->iv=32
+```
+
+For sequence properties entries generated in the log line use array sintax:
+
+```csharp
+LogContext.PushProperty("test", new[] {10, 100, 1000});
+```
+
+This property generates following entries in log line:
+
+```
+test[0]=10 test[1]=100 test[2]=1000
 ```
 
 ### Preserving case of property names

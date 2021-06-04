@@ -27,7 +27,7 @@ namespace Test
                     config.MinimumLevel.Verbose()
                     .Enrich.FromLogContext()
                     // .WriteTo.Console()
-                    .WriteTo.Console(formatter: new LogfmtFormatter());
+                    .WriteTo.Console(formatter: new LogfmtFormatter(opt => opt.IncludeAllProperties().UseComplexPropertySeparator(".")));
                 })
                 .ConfigureWebHostDefaults(webBuilder =>
                 {

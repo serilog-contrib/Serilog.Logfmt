@@ -18,6 +18,8 @@ namespace Serilog.Logfmt
 
         internal Func<string, bool> PropertyKeyFilter { get; private set; }
 
+        internal string ComplexPropertySeparator { get; private set; }
+
         public LogfmtOptions()
         {
             NormalizeCase = true;
@@ -25,11 +27,18 @@ namespace Serilog.Logfmt
             PropertyKeyFilter = k => false;
             ExceptionOptions = new LogExceptionOptions();
             DoubleQuotesAction = DoubleQuotesAction.ConvertToSingle;
+            ComplexPropertySeparator = ".";
         }
 
         public LogfmtOptions PreserveCase()
         {
             NormalizeCase = false;
+            return this;
+        }
+
+        public LogfmtOptions UseComplexPropertySeparator(string separator)
+        {
+            ComplexPropertySeparator = separator;
             return this;
         }
 
