@@ -38,10 +38,13 @@ namespace Test
                     var logger = lf.CreateLogger("Startup");
                     LogContext.PushProperty("complex", new { Name = @"Property ""DOUBLE QUOTES"" on it", When = DateTime.UtcNow, Value = 42, Sub = new { Name = "Test", Iv = 32 } }, true);
                     LogContext.PushProperty("str", "Simple string property");
+                    LogContext.PushProperty("equals", "this=that");
                     LogContext.PushProperty("int", 42);
                     LogContext.PushProperty("test", new[] {10, 100, 1000});
                     var value = @"This value also have ""double quotes"" on it";
                     logger.LogInformation(@"Message with ""double quotes"" and a str value: {value} :) ", value);
+                    logger.LogInformation("justalog");
+                    logger.LogInformation("justalog=with=equals");
 
                     await context.Response.WriteAsync("Hello World!");
                 });

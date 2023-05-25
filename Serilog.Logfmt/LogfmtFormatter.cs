@@ -50,7 +50,7 @@ namespace Serilog.Logfmt
                 msg = sw.ToLogfmtQuotedString(_options.DoubleQuotesAction);
             }
 
-            if (msg.Contains(" "))
+            if (msg.Contains(" ") || msg.Contains("="))
             {
                 output.WriteLine($@"""{msg}""");
             }
@@ -58,7 +58,7 @@ namespace Serilog.Logfmt
             {
                 output.WriteLine(msg);
             }
-            
+
             if (logEvent.Exception != null)
             {
                 LogException(logEvent, output);
@@ -73,7 +73,7 @@ namespace Serilog.Logfmt
             output.Write("ts={0} ", logEvent.Timestamp.UtcDateTime.ToString("o"));
             if (dataOptions != LogfmtExceptionDataFormat.None)
             {
-                
+
                 if (dataOptions.HasFlag(LogfmtExceptionDataFormat.Level))
                 {
                     output.Write("level={0} ", _options.GrafanaLevels ? "err" : LogEventLevel.Error.ToString());
@@ -112,7 +112,7 @@ namespace Serilog.Logfmt
                 case LogEventLevel.Verbose: return "trace";
                 default: return "unknown";
             }
-        } 
+        }
 
         private string GetNormalizedKeyCase(string key)
         {
