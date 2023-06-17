@@ -193,7 +193,7 @@ ts=2021-02-19T18:28:20.9512779Z level=err err="Authentication failed because the
 
 > Keep in mind that some log processors have problems dealing with this multiline stack traces, because each line is treated like a separated log entry.
 
-If you use `LogfmtStackTraceFormat.Single` then the stack trace is generated in a single (long) line:
+If you use `LogfmtStackTraceFormat.SingleLine` then the stack trace is generated in a single (long) line:
 
 ```
 ts=2021-02-19T18:35:26.8931544Z level=err err="Authentication failed because the remote party has closed the transport stream."    at System.Net.Security.SslStream.StartReadFrame(Byte[] buffer, Int32 readBytes, AsyncProtocolRequest asyncRequest)   at System.Net.Security.SslStream.PartialFrameCallback(AsyncProtocolRequest asyncRequest)--- End of stack trace from previous location where exception was thrown ---   at System.Net.Security.SslStream.ThrowIfExceptional()   at System.Net.Security.SslStream.InternalEndProcessAuthentication(LazyAsyncResult lazyResult)   at System.Net.Security.SslStream.EndProcessAuthentication(IAsyncResult result)   at System.Net.Security.SslStream.EndAuthenticateAsServer(IAsyncResult asyncResult)   at System.Net.Security.SslStream.<>c.<AuthenticateAsServerAsync>b__69_1(IAsyncResult iar)   at System.Threading.Tasks.TaskFactory`1.FromAsyncCoreLogic(IAsyncResult iar, Func`2 endFunction, Action`1 endAction, Task`1 promise, Boolean requiresSynchronization)--- End of stack trace from previous location where exception was thrown ---   at Microsoft.AspNetCore.Server.Kestrel.Https.Internal.HttpsConnectionMiddleware.InnerOnConnectionAsync(ConnectionContext context)
